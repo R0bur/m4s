@@ -1,0 +1,73 @@
+# SliTaz package receipt v2.
+
+PACKAGE="efl"
+SPLIT="efl-dev efl-lang"
+VERSION="1.25.1"
+CATEGORY="x-window"
+SHORT_DESC="Enlightenment Foundation Libraries"
+MAINTAINER="robursw@gmail.com"
+LICENSE="LGPL2.1"
+WEB_SITE="https://www.enlightenment.org/about-efl"
+
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+TARBALL_SHA256="351ca0211ca000234527a503585f039f985607ec9439e34b49d8b8bbf35a7e6b"
+WGET_URL="https://download.enlightenment.org/rel/libs/efl/$TARBALL"
+
+BUILD_DEPENDS="autoconf doxygen gettext automake libtool gmp meson ninja \
+	shared-mime-info lua5.1-dev zlib-dev dbus-dev libinput-dev libxkbcommon-dev \
+	libsndfile-dev pulseaudio-dev udisks2-dev util-linux-mount-dev \
+	xorg-libXcomposite-dev xorg-libXdamage-dev xorg-libXrandr-dev \
+	xorg-libXinerama-dev xorg-libXtst-dev xorg-libXss-dev \
+	libpng-dev tiff-dev giflib-dev libwebp-dev openjpeg2-dev freetype-dev \
+	fontconfig-dev fribidi-dev gstreamer-1.0-dev gst-plugins-base-1.0-dev \
+	poppler-dev librsvg-dev check-dev xcb-util-keysyms-dev \
+	openssl-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	meson setup --prefix=/usr -Dbuild-tests=false -Dopengl=none \
+		-Devas-loaders-disabler=json,avif,ps,raw \
+		-Decore-imf-loaders-disabler=ibus,scim \
+		-Dlua-interpreter=lua \
+		-Dbuild-examples=false -Dbuild-tests=false \
+		build . &&
+	ninja -C build &&
+	DESTDIR=$DESTDIR ninja -C build install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	case $PACKAGE in
+		efl)
+			copy @std
+			cook_copy_icons 128
+			DEPENDS="cairo dbus eudev-lib fontconfig freetype \
+				fribidi giflib glib gst-plugins-base-1.0 \
+				gstreamer-1.0 harfbuzz libcrypto libinput \
+				libjpeg libpng librsvg libssl libwebp \
+				libxkbcommon openjpeg2 poppler python tiff \
+				util-linux-mount xorg-libX11 \
+				xorg-libXcomposite xorg-libXcursor \
+				xorg-libXdamage xorg-libXext xorg-libXfixes \
+				xorg-libXi xorg-libXinerama xorg-libXrandr \
+				xorg-libXrender xorg-libXss xorg-libXtst zlib"
+			;;
+		efl-dev)
+			copy @dev 
+			DEPENDS="dbus-dev eudev-dev jpeg-dev libinput-dev \
+				libsndfile-dev libxcb-dev libxkbcommon-dev \
+				openssl-dev pulseaudio-dev util-linux-mount-dev \
+				xorg-libX11-dev xorg-libXcomposite xorg-libXcursor \
+				xorg-libXdamage xorg-libXext xorg-libXfixes \
+				xorg-libXi xorg-libXinerama xorg-libXrandr \
+				xorg-libXrender xorg-libXss xorg-libXtst \
+				zlib-dev"
+			;;
+		efl-lang)
+			copy *.mo
+			DEPENDS="efl"
+			;;
+	esac
+}
