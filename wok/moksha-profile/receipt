@@ -1,0 +1,29 @@
+# SliTaz package receipt v2.
+
+PACKAGE="moksha-profile"
+VERSION="0.4.1"
+CATEGORY="x-window"
+SHORT_DESC="Configuration files for the Moksha Desktop."
+MAINTAINER="robursw@gmail.com"
+LICENSE="CC0"
+WEB_SITE="https://github.com/r0bur/m4s"
+
+TARBALL="moksha041-profile-0.1.0.tar.gz"
+TARBALL_SHA256="24f7419a336b60992c3279c6e436c010bc501d217f9f265d3a544f705284d25e"
+WGET_URL="https://github.com/R0bur/m4s/raw/refs/heads/main/configs/$TARBALL"
+
+BUILD_DEPENDS=""
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	mkdir $install
+	cp -R ./usr $install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	copy *.cfg *.edj icon.png profile.desktop
+	DEPENDS="pcmanfm slitaz-icons-dark moksha"
+}
