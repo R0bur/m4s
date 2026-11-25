@@ -1,0 +1,44 @@
+# SliTaz package receipt v2.
+
+PACKAGE="moksha"
+SPLIT="moksha-lang"
+VERSION="0.4.1"
+CATEGORY="x-window"
+SHORT_DESC="A fast, lightweight and highly customizable desktop environment."
+MAINTAINER="robursw@gmail.com"
+LICENSE="BSD OFL"
+WEB_SITE="https://www.bodhilinux.com/moksha-desktop/"
+
+TARBALL="$PACKAGE-$VERSION.tar.gz"
+WGET_URL="https://github.com/JeffHoogland/$PACKAGE/archive/refs/tags/$VERSION.tar.gz"
+TARBALL_SHA256="844d0c1941becd5e2ecce1b6c1a234c9b5d08a04ea88b59236c2ed16eec205ce"
+
+BUILD_DEPENDS="autoconf automake libtool file shared-mime-info efl-dev dbus-dev \
+	jpeg-dev openssl-dev udisks2-dev util-linux-mount-dev eudev-dev \
+	lua5.1-dev freetype-dev fontconfig-dev libxml2-dev fribidi-dev \
+	libsndfile-dev pulseaudio-dev alsa-lib-dev xorg-libX11-dev \
+	xorg-libXcomposite xorg-libXdamage xorg-libXfixes xorg-libXinerama \
+	xorg-libXrandr xorg-libXtst xorg-libXss xorg-libXi xorg-libXcursor \
+	xcb-util-keysyms-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	sed -i '/^UDISKS2_REQUIRED=/s/2\.7\.2/2.1.8/' configure.ac
+	./autogen.sh --prefix=/usr --disable-bodhi --disable-doc && make && make install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	case $PACKAGE in
+		moksha)
+			copy @std
+			DEPENDS="dbus efl libxcb pulseaudio udisks2 xcb-util-keysyms"
+			;;
+		moksha-lang)
+			copy *.mo
+			DEPENDS="moksha"
+			;;
+	esac
+}
