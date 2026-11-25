@@ -1,0 +1,47 @@
+# SliTaz package receipt v2.
+
+PACKAGE="terminology"
+SPLIT="terminology-lang"
+VERSION="1.14.0"
+CATEGORY="utilities"
+SHORT_DESC="Terminal emulator for Linux/BSD/UNIX systems that uses EFL."
+MAINTAINER="robursw@gmail.com"
+LICENSE="BSD"
+WEB_SITE="https://www.enlightenment.org/about-terminology"
+
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+TARBALL_SHA256="f354057051b05cffb699e33836a1135db1d4ed8bf954f9b57dc0e93bc307514d"
+WGET_URL="https://download.enlightenment.org/rel/apps/$PACKAGE/$TARBALL"
+
+BUILD_DEPENDS="autoconf gettext automake libtool shared-mime-info meson ninja \
+	freetype-dev fontconfig-dev lua5.1-dev libxml2-dev fribidi-dev \
+	dbus-dev util-linux-mount-dev eudev-dev libsndfile-dev \
+	pulseaudio-dev openssl-dev jpeg-dev xorg-libX11-dev \
+	xorg-libXcomposite xorg-libXcursor xorg-libXdamage xorg-libXext \
+	xorg-libXfixes xorg-libXi xorg-libXinerama xorg-libXrandr \
+	xorg-libXrender xorg-libXss xorg-libXtst efl-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	sed -i '/^efl_version = /s/1\.26\.0/1.25.1/' meson.build
+	meson setup --prefix=/usr build . &&
+	ninja -C build &&
+	DESTDIR=$DESTDIR ninja -C build install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	case $PACKAGE in
+		terminology)
+			copy @std
+			cook_copy_icons 128
+			DEPENDS="efl"
+			;;
+		terminology-lang)
+			copy *.mo
+			DEPENDS="terminology"
+			;;		
+	esac
+}
